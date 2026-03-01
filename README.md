@@ -1,5 +1,9 @@
 ⚠️ Disclaimer
+
+
 ![Keylogger](Images/image.png)
+
+
 
 This script is developed strictly for educational and research purposes only. Its primary goal is to help students and cybersecurity enthusiasts understand how keyboard input monitoring works at a technical level and how such mechanisms can be detected and mitigated.
 
