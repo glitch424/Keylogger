@@ -21,9 +21,9 @@ Hello!
         print("✅ Email sent successfully!")
 
 # ===== EDIT THESE 4 LINES =====
-my_email = "s.chandra12005@gmail.com"              # Your Gmail address
-my_password = "rfie jmlj tttn akvw"           # Your 16-char App Password
-recipient = "sarthakchandra1232005@gmail.com"           # Who receives the email
+my_email = "sender@gmail.com"              # Your Gmail address
+my_password = "xxxx xxxx xxxx xxxx"           # Your 16-char App Password
+recipient = "receiver@gmail.com"           # Who receives the email
 msg = "This is a email mafia from Python anna!"    # Your message
 # ==============================
 
