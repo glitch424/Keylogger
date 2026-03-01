@@ -150,7 +150,7 @@ finally:
                 attachment_path=file_path
             )
 
-        import datetime
+        
 
         def screenshot(self):
             img = pyscreenshot.grab()
